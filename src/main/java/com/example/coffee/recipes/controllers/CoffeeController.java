@@ -15,7 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/coffee")
+@RequestMapping("/api/coffees")
 @RequiredArgsConstructor
 public class CoffeeController {
     private final ICoffeeService coffeeService;
@@ -34,8 +34,8 @@ public class CoffeeController {
 
     @PostMapping
     public ResponseEntity<Coffee> saveCoffee(@Valid @RequestBody CoffeeRequestDto requestDto) {
-        Coffee coffeeSaved = coffeeService.save(requestDto);
-        return new ResponseEntity<>(coffeeSaved, HttpStatus.CREATED);
+        Coffee newCoffee = coffeeService.save(requestDto);
+        return new ResponseEntity<>(newCoffee, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

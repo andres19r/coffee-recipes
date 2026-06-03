@@ -16,5 +16,4 @@ public interface ICoffeeService {
     Coffee findById(UUID id);
 
     void deleteById(UUID id);
-
 }
