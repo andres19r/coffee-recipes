@@ -1,7 +1,7 @@
 package com.example.coffee.recipes.controllers;
 
 import com.example.coffee.recipes.dtos.CoffeeRequestDto;
-import com.example.coffee.recipes.entities.Coffee;
+import com.example.coffee.recipes.dtos.CoffeeResponseDto;
 import com.example.coffee.recipes.services.ICoffeeService;
 
 import org.springframework.http.HttpStatus;
@@ -21,26 +21,27 @@ public class CoffeeController {
     private final ICoffeeService coffeeService;
 
     @GetMapping
-    public ResponseEntity<List<Coffee>> getAllCoffees() {
-        List<Coffee> coffees = coffeeService.findAll();
+    public ResponseEntity<List<CoffeeResponseDto>> getAllCoffees() {
+        List<CoffeeResponseDto> coffees = coffeeService.findAll();
         return ResponseEntity.ok(coffees);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Coffee> getCoffeeById(@PathVariable UUID id) {
-        Coffee coffee = coffeeService.findById(id);
+    public ResponseEntity<CoffeeResponseDto> getCoffeeById(@PathVariable UUID id) {
+        CoffeeResponseDto coffee = coffeeService.findById(id);
         return ResponseEntity.ok(coffee);
     }
 
     @PostMapping
-    public ResponseEntity<Coffee> saveCoffee(@Valid @RequestBody CoffeeRequestDto requestDto) {
-        Coffee newCoffee = coffeeService.save(requestDto);
+    public ResponseEntity<CoffeeResponseDto> saveCoffee(@Valid @RequestBody CoffeeRequestDto requestDto) {
+        CoffeeResponseDto newCoffee = coffeeService.save(requestDto);
         return new ResponseEntity<>(newCoffee, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Coffee> updateCoffee(@PathVariable UUID id, @Valid @RequestBody CoffeeRequestDto requestDto) {
-        Coffee updatedCoffee = coffeeService.update(id, requestDto);
+    public ResponseEntity<CoffeeResponseDto> updateCoffee(@PathVariable UUID id,
+                                                          @Valid @RequestBody CoffeeRequestDto requestDto) {
+        CoffeeResponseDto updatedCoffee = coffeeService.update(id, requestDto);
         return ResponseEntity.ok(updatedCoffee);
     }
 

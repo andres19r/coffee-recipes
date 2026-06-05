@@ -1,6 +1,7 @@
 package com.example.coffee.recipes.entities;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public class Coffee {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "coffee", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Recipe> recipes;
+    private List<Recipe> recipes = new ArrayList<>();
 
     public void addRecipe(Recipe recipe) {
         recipes.add(recipe);

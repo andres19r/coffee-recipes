@@ -1,6 +1,7 @@
 package com.example.coffee.recipes.services;
 
 import com.example.coffee.recipes.dtos.CoffeeRequestDto;
+import com.example.coffee.recipes.dtos.CoffeeResponseDto;
 import com.example.coffee.recipes.entities.Coffee;
 import com.example.coffee.recipes.exceptions.ResourceNotFoundException;
 import com.example.coffee.recipes.mappers.CoffeeMapper;
@@ -20,33 +21,40 @@ public class CoffeeService implements ICoffeeService {
     private final CoffeeMapper coffeeMapper;
 
     @Override
-    public List<Coffee> findAll() {
-        return coffeeRepository.findAll();
+    public List<CoffeeResponseDto> findAll() {
+        List<Coffee> coffees = coffeeRepository.findAll();
+        return coffees.stream().map(coffeeMapper::toResponseDto).toList();
     }
 
     @Override
-    public Coffee save(CoffeeRequestDto requestDto) {
+    public CoffeeResponseDto save(CoffeeRequestDto requestDto) {
         Coffee coffee = coffeeMapper.toEntity(requestDto);
-        return coffeeRepository.save(coffee);
+        Coffee savedCoffee = coffeeRepository.save(coffee);
+        return coffeeMapper.toResponseDto(savedCoffee);
     }
 
     @Override
-    public Coffee update(UUID id, CoffeeRequestDto requestDto) {
-        Coffee coffee = this.findById(id);
+    public CoffeeResponseDto update(UUID id, CoffeeRequestDto requestDto) {
+        Coffee coffee = findCoffeeById(id);
         coffeeMapper.updateFromDto(requestDto, coffee);
-        return coffeeRepository.save(coffee);
+        Coffee updatedCoffee = coffeeRepository.save(coffee);
+        return coffeeMapper.toResponseDto(updatedCoffee);
     }
 
     @Override
-    public Coffee findById(UUID id) {
-        return coffeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Coffee not found with uuid: " + id));
+    public CoffeeResponseDto findById(UUID id) {
+        Coffee coffee = findCoffeeById(id);
+        return coffeeMapper.toResponseDto(coffee);
     }
 
     @Override
     public void deleteById(UUID id) {
-        Coffee coffee = this.findById(id);
+        Coffee coffee = findCoffeeById(id);
         coffeeRepository.delete(coffee);
+    }
 
+    public Coffee findCoffeeById(UUID id) {
+        return coffeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Coffee not found with uuid: " + id));
     }
 }

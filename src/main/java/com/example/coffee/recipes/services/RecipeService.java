@@ -1,6 +1,7 @@
 package com.example.coffee.recipes.services;
 
 import com.example.coffee.recipes.dtos.RecipeRequestDto;
+import com.example.coffee.recipes.dtos.RecipeResponseDto;
 import com.example.coffee.recipes.entities.Coffee;
 import com.example.coffee.recipes.entities.Recipe;
 import com.example.coffee.recipes.exceptions.ResourceNotFoundException;
@@ -22,41 +23,49 @@ public class RecipeService implements IRecipeService {
     private final ICoffeeService coffeeService;
 
     @Override
-    public List<Recipe> findAll() {
-        return recipeRepository.findAll();
+    public List<RecipeResponseDto> findAll() {
+        List<Recipe> recipes = recipeRepository.findAll();
+        return recipes.stream().map(recipeMapper::toResponseDto).toList();
     }
 
     @Override
-    public Recipe save(RecipeRequestDto requestDto) {
+    public RecipeResponseDto save(RecipeRequestDto requestDto) {
         Recipe recipe = recipeMapper.toEntity(requestDto);
-        Coffee coffee = coffeeService.findById(requestDto.coffeeId());
+        Coffee coffee = coffeeService.findCoffeeById(requestDto.coffeeId());
         coffee.addRecipe(recipe);
-        return recipeRepository.save(recipe);
+        Recipe savedRecipe = recipeRepository.save(recipe);
+        return recipeMapper.toResponseDto(savedRecipe);
     }
 
     @Override
-    public Recipe update(UUID id, RecipeRequestDto requestDto) {
-        Recipe recipe = this.findById(id);
+    public RecipeResponseDto update(UUID id, RecipeRequestDto requestDto) {
+        Recipe recipe = this.findRecipeById(id);
         UUID coffeeId = recipe.getCoffee().getId();
         if (requestDto.coffeeId() != coffeeId) {
-            Coffee oldCoffee = coffeeService.findById(coffeeId);
+            Coffee oldCoffee = coffeeService.findCoffeeById(coffeeId);
             oldCoffee.removeRecipe(recipe);
-            Coffee newCoffee = coffeeService.findById(requestDto.coffeeId());
+            Coffee newCoffee = coffeeService.findCoffeeById(requestDto.coffeeId());
             newCoffee.addRecipe(recipe);
         }
         recipeMapper.updateFromDto(requestDto, recipe);
-        return recipeRepository.save(recipe);
+        Recipe updatedRecipe = recipeRepository.save(recipe);
+        return recipeMapper.toResponseDto(updatedRecipe);
     }
 
     @Override
-    public Recipe findById(UUID id) {
-        return recipeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with uuid: " + id));
+    public RecipeResponseDto findById(UUID id) {
+        Recipe recipe = findRecipeById(id);
+        return recipeMapper.toResponseDto(recipe);
     }
 
     @Override
     public void deleteById(UUID id) {
-        Recipe recipe = this.findById(id);
+        Recipe recipe = this.findRecipeById(id);
         recipeRepository.delete(recipe);
+    }
+
+    private Recipe findRecipeById(UUID id) {
+        return recipeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with uuid: " + id));
     }
 }

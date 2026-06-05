@@ -1,7 +1,5 @@
 package com.example.coffee.recipes.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -45,6 +43,5 @@ public class Recipe {
     @JoinColumn(name = "coffee_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @JsonIgnore
     private Coffee coffee;
 }
