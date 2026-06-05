@@ -1,5 +1,6 @@
 package com.example.coffee.recipes.entities;
 
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -20,6 +21,8 @@ public class Recipe {
     @Column(nullable = false)
     private Integer dose;
 
+    private Double totalCup;
+
     @Column(nullable = false)
     private Integer grindingClicks;
 
@@ -28,6 +31,8 @@ public class Recipe {
 
     @Column(nullable = false)
     private Integer numOfPours;
+
+    private List<String> pours;
 
     @Column(nullable = false)
     private String method;

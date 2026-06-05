@@ -10,6 +10,7 @@ import com.example.coffee.recipes.repositories.RecipeRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +32,8 @@ public class RecipeService implements IRecipeService {
     @Override
     public RecipeResponseDto save(RecipeRequestDto requestDto) {
         Recipe recipe = recipeMapper.toEntity(requestDto);
+        recipe.setTotalCup((double) (recipe.getDose() * recipe.getRatio()));
+        recipe.setPours(this.getPourList(recipe.getTotalCup(), requestDto.numOfPours()));
         Coffee coffee = coffeeService.findCoffeeById(requestDto.coffeeId());
         coffee.addRecipe(recipe);
         Recipe savedRecipe = recipeRepository.save(recipe);
@@ -67,5 +70,14 @@ public class RecipeService implements IRecipeService {
     private Recipe findRecipeById(UUID id) {
         return recipeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with uuid: " + id));
+    }
+
+    private List<String> getPourList(Double totalCup, Integer numOfPours) {
+        double initialPour = totalCup / numOfPours;
+        List<String> pours = new ArrayList<>();
+        for (int i = 1; i <= numOfPours; i++) {
+            pours.add(String.format("%.1f", initialPour * i));
+        }
+        return pours;
     }
 }
